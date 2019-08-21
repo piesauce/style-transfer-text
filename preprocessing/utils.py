@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import nltk
+from keras.preprocessing.sequence import pad_sequences
 
 # def merge_plays(path):
     # plays_original_list = []
@@ -108,5 +109,94 @@ def get_name_play(filename):
     filename = filename.rsplit('/',1)[1]
     index = filename.find('_ori')
     return filename[:index]
+
+def load_data(path):
+    with open(os.path.join(path,'merged_plays_original2.aligned'), 'r') as orig, open(os.path.join(path, 'merged_plays_modern2.aligned'), 'r') as mod:
+        original_text = orig.read()
+        modern_text = mod.read()
+    return original_text, modern_text
+
+def preprocess(original, modern):
+    orig_preprocessed = [line.strip().lower().split(' ') for line in original]
+    mod_preprocessed = [line.strip().lower().split(' ') for line in modern]
+    return orig_preprocessed, mod_preprocessed
+    
+
+def initialize_vocab():
+    word_to_idx = {}
+    idx_to_word = {}
+    num_words = 0
+    word_counts = {}
+    
+    special_entries = ['PAD', 'START', 'END', 'UNK']
+    for symbol in special_entries:
+        word_to_idx[symbol] = num_words
+        idx_to_word[num_words] = symbol
+        word_counts[symbol] = 1
+        num_words += 1
+    return word_to_idx, idx_to_word, num_words, word_counts
+
+def fill_common_vocab(word_to_idx, idx_to_word, num_words, word_counts, original, modern):
+    for line in original:
+        for word in line:
+            if word not in word_to_idx:
+                word_to_idx[word] = num_words
+                idx_to_word[num_words] = word
+                word_counts[word] = 1
+                num_words += 1
+            else:
+                word_counts[word] += 1
+    for line in modern:
+        for word in line:
+            if word not in word_to_idx:
+                word_to_idx[word] = num_words
+                idx_to_word[num_words] = word
+                word_counts[word] = 1
+                num_words += 1
+            else:
+                word_counts[word] += 1
+    return word_to_idx, idx_to_word, num_words, word_counts
+
+def truncate_vocab(word_counts, max_vocab_size):
+    word_to_idx, idx_to_word, num_words, truncated_word_counts = initialize_vocab()
+    truncated_word_counts = sorted(word_counts, key=word_counts.get, reverse=True)[:max_vocab_size]
+    for word in truncated_word_counts:
+        if word not in ['UNK', 'PAD', 'START', 'END']:
+            word_to_idx[word] = num_words
+            idx_to_word[num_words] = word
+            num_words += 1
+    
+    return word_to_idx, idx_to_word, num_words, truncated_word_counts
+
+def prepare_sequences(orig, mod, word_to_idx):
+    orig_sequences = []
+    mod_sequences = []
+    for line in orig:
+        temp = [word_to_idx['START']]
+        for word in line:
+            if word not in word_to_idx:
+                temp.append(word_to_idx['UNK'])
+            else:
+                temp.append(word_to_idx[word])
+        temp.append(word_to_idx['END'])
+        orig_sequences.append(temp)
+    for line in mod:
+        temp = [word_to_idx['START']]
+        for word in line:
+            if word not in word_to_idx:
+                temp.append(word_to_idx['UNK'])
+            else:
+                temp.append(word_to_idx[word])
+        temp.append(word_to_idx['END'])
+        mod_sequences.append(temp)
+    return orig_sequences, mod_sequences
+    
+def pad_seq(orig_sequences, mod_sequences):
+    orig_seq_padded = pad_sequences(orig_sequences, maxlen=25, padding='pre', truncating='post')
+    mod_seq_padded = pad_sequences(mod_sequences, maxlen=25, padding='post', truncating='post')
+    return orig_seq_padded, mod_seq_padded
+
+def toText(text, idx_to_word):
+    return [idx_to_word[word] for word in text]
 
     
