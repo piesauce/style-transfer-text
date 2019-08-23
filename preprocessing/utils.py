@@ -198,5 +198,26 @@ def pad_seq(orig_sequences, mod_sequences):
 
 def toText(text, idx_to_word):
     return [idx_to_word[word] for word in text]
+    
+def prepare_for_translation(orig_seq, mod_seq):
+    encoder_inputs = np.array(orig_seq)
+    decoder_inputs = np.array([seq[:-1] for seq in mod_seq])
+    decoder_outputs = np.array([seq[1:] for seq in mod_seq])
+    return encoder_inputs, decoder_inputs, decoder_outputs
+
+def create_matching_tokens_array(encoder_inputs, decoder_outputs):
+    matching_tokens_array = []
+    for cur_input, cur_output in zip(encoder_inputs, decoder_outputs):
+        temp = []
+        for out_token in cur_output:
+            arr = np.zeros(len(cur_input), dtype=np.float32)
+            for i, inp_token in enumerate(cur_input):
+                if inp_token <=3:
+                    continue
+                if inp_token == out_token:
+                    arr[i] = 1.0
+            temp.append(arr)
+        matching_tokens_array.append(temp)
+    return np.array(matching_tokens_array)
 
     
