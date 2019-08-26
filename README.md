@@ -8,9 +8,9 @@ Data
 
 The training data is comprised of text from 14 Shakespearean play along with their translations in modern English. The data is taken from /cocoxu's [repository]( https://github.com/cocoxu/Shakespeare/tree/master/data). The data folder also contains a shakespearean english - modern english dictionary, also taken from the same repository. Pre-trained embeddings are taken from this repository - https://github.com/harsh19/Shakespearizing-Modern-English/
 
-The eda folder contains data analyis of the Shakespearan plays, exploring the key characteristics, frequency distribution, and idiosyncracies of the text
+The eda folder contains data analysis of the Shakespearan plays, exploring the key characteristics, frequency distribution, and idiosyncracies of the text
 
-The models folder contains a pytorch implementation of seq2seq with a pointer component. Also present is the retrofitting of pre-trained embeddings by leveraging the Shakespearean-Modern English dictionary.
+The models folder contains a pytorch implementation of seq2seq with a pointer component. Also present is the code for retrofitting of pre-trained embeddings by leveraging the Shakespearean-Modern English dictionary.
 
 The evaluation folder contains evaluation of style transfer measured through BLEU and PINC metrics
 
