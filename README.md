@@ -5,6 +5,7 @@ The aim of this project is to explore translation between Shakespearean and Mode
 pointer networks are employed for this purpose.
 
 Data
+
 The training data is comprised of text from 14 Shakespearean play along with their translations in modern English. The data is taken from /cocoxu's [repository]( https://github.com/cocoxu/Shakespeare/tree/master/data). The data folder also contains a shakespearean english - modern english dictionary, also taken from the same repository. Pre-trained embeddings are taken from this repository - https://github.com/harsh19/Shakespearizing-Modern-English/
 
 The eda folder contains data analyis of the Shakespearan plays, exploring the key characteristics, frequency distribution, and idiosyncracies of the text
